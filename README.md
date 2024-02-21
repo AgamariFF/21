@@ -1,1 +1,1 @@
-<h1>Russian game at 21</h1>
+<h1 align=center>Russian game at 21</h1>
