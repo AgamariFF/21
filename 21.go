@@ -92,32 +92,48 @@ func PrintPlayer(playerCards [9]int8) {
 	SlowPrint(".", 20000, true)
 }
 
-func GiveCard(user int8, deck, userCards [9]int8) (int8, [9]int8, [9]int8) {
+func GiveCard(user int8, counterCard int8, deck [36]int8, userCards [9]int8) (int8, int8, [36]int8, [9]int8) {
+	if deck[counterCard] == -1 {
+		panic("В колоде закончились карты!")
+	} else if deck[counterCard] < 3 {
+		user += deck[counterCard] + 2
+	} else if deck[counterCard] > 2 {
+		user += deck[counterCard] + 3
+	}
+	userCards[deck[counterCard]] += 1
+	deck[counterCard] = -1
+	counterCard += 1
+	return user, counterCard, deck, userCards
+}
+
+func StirDeck() [36]int8 {
+	var CountDeck [9]int8
+	var Deck [36]int8
 	var card int8
-	for card = int8(rand.Int31n(9)); deck[card] == 4; {
+	for count := 0; count < 36; {
 		card = int8(rand.Int31n(9))
+		for CountDeck[card] > 3 {
+			card = int8(rand.Int31n(9))
+		}
+		CountDeck[card] += 1
+		Deck[count] = card
+		count++
 	}
-	deck[card] += 1
-	userCards[card] += 1
-	if card < 3 {
-		user += card + 2
-	} else {
-		user += card + 3
-	}
-	return user, deck, userCards
+	return Deck
 }
 
 func play() {
 	var take string
-	var deck, playerCards, dealerCards [9]int8
-	var dealer, player int8
-	dealer, deck, dealerCards = GiveCard(dealer, deck, dealerCards)
-	player, deck, playerCards = GiveCard(player, deck, playerCards)
+	var playerCards, dealerCards [9]int8
+	var dealer, player, counterCard int8
+	deck := StirDeck()
+	dealer, counterCard, deck, dealerCards = GiveCard(dealer, counterCard, deck, dealerCards)
+	player, counterCard, deck, playerCards = GiveCard(player, counterCard, deck, playerCards)
 	PrintPlayer(playerCards)
 	SlowPrint("Взять еще карту? (y/n)", 20000, true)
 	fmt.Scan(&take)
 	for player < 21 && string(take) == "y" {
-		player, deck, playerCards = GiveCard(player, deck, playerCards)
+		player, counterCard, deck, playerCards = GiveCard(player, counterCard, deck, playerCards)
 		PrintPlayer(playerCards)
 		if player < 21 {
 			SlowPrint("Взять еще карту? (y/n)", 20000, true)
@@ -127,7 +143,7 @@ func play() {
 	SlowPrint("Дилер берёт карты.", 20000, true)
 	time.Sleep(1000 * time.Millisecond)
 	for dealer < 17 {
-		dealer, deck, dealerCards = GiveCard(dealer, deck, dealerCards)
+		dealer, counterCard, deck, dealerCards = GiveCard(dealer, counterCard, deck, dealerCards)
 	}
 	SlowPrint("У дилера ", 20000, false)
 	fmt.Print(dealer)
