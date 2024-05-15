@@ -3,8 +3,14 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
+
+type card struct {
+	suit    int
+	meaning int
+}
 
 func SlowPrint(s string, p int, nl bool) {
 	str := []rune(s)
@@ -17,106 +23,158 @@ func SlowPrint(s string, p int, nl bool) {
 	}
 }
 
-func PrintPlayer(playerCards [9]int8) {
-	var score int8 = 0
-	SlowPrint("У вас:", 20000, false)
+func PrintPlayer(playerCards [36]card) {
+	var score, count int
+	var chek = false
+	SlowPrint("Ваши карты:", 20000, true)
 	for i := 0; i < len(playerCards); i++ {
-		if playerCards[i] == 1 {
-			SlowPrint(" ", 20000, false)
-			fmt.Print(playerCards[i])
-			switch i {
-			case 0:
-				score += 2
-				SlowPrint(" валет", 20000, false)
-			case 1:
-				score += 3
-				SlowPrint(" дама", 20000, false)
-			case 2:
-				score += 4
-				SlowPrint(" король", 20000, false)
-			case 3:
-				score += 6
-				SlowPrint(" шестерка", 20000, false)
-			case 4:
-				score += 7
-				SlowPrint(" семерка", 20000, false)
-			case 5:
-				score += 8
-				SlowPrint(" восьмерка", 20000, false)
-			case 6:
-				score += 9
-				SlowPrint(" девятка", 20000, false)
-			case 7:
-				score += 10
-				SlowPrint(" десятка", 20000, false)
-			case 8:
-				score += 11
-				SlowPrint(" туз", 20000, false)
+		if playerCards[i].meaning == -1 {
+			break
+		} else {
+			if playerCards[i].meaning < 3 {
+				score += playerCards[i].meaning + 2
+			} else if playerCards[i].meaning > 2 {
+				score += playerCards[i].meaning + 3
 			}
-		} else if playerCards[i] > 1 {
-			SlowPrint(" ", 20000, false)
-			fmt.Print(playerCards[i])
-			switch i {
-			case 0:
-				score += int8(2 * playerCards[i])
-				SlowPrint(" вальта", 20000, false)
-			case 1:
-				score += int8(3 * playerCards[i])
-				SlowPrint(" дамы", 20000, false)
-			case 2:
-				score += int8(4 * playerCards[i])
-				SlowPrint(" короля", 20000, false)
-			case 3:
-				score += int8(6 * playerCards[i])
-				SlowPrint(" шестерки", 20000, false)
-			case 4:
-				score += int8(7 * playerCards[i])
-				SlowPrint(" семерки", 20000, false)
-			case 5:
-				score += int8(8 * playerCards[i])
-				SlowPrint(" восьмерки", 20000, false)
-			case 6:
-				score += int8(9 * playerCards[i])
-				SlowPrint(" девятки", 20000, false)
-			case 7:
-				score += int8(10 * playerCards[i])
-				SlowPrint(" десятки", 20000, false)
-			case 8:
-				score += int8(11 * playerCards[i])
-				SlowPrint(" туза", 20000, false)
-			}
+			count++
 		}
 	}
-	SlowPrint(". Сумма очков ", 20000, false)
+	SlowPrint(strings.Repeat(" ___  ", count), 7000, true)
+	var str string
+	for i := 0; i < len(playerCards); i++ {
+		switch playerCards[i].meaning {
+		case -1:
+			{
+				fmt.Println()
+				chek = true
+				break
+			}
+		case 0:
+			str = "|В  | "
+		case 1:
+			str = "|Д  | "
+		case 2:
+			str = "|К  | "
+		case 3:
+			str = "|6  | "
+		case 4:
+			str = "|7  | "
+		case 5:
+			str = "|8  | "
+		case 6:
+			str = "|9  | "
+		case 7:
+			str = "|10 | "
+		case 8:
+			str = "|Т  | "
+		}
+		if chek {
+			break
+		}
+		SlowPrint(str, 7000, false)
+	}
+	chek = false
+	var suit string
+	for i := 0; i < len(playerCards); i++ {
+		switch playerCards[i].suit {
+		case -1:
+			{
+				fmt.Println()
+				chek = true
+				break
+			}
+		case 0:
+			suit = "♥"
+		case 1:
+			suit = "♦"
+		case 2:
+			suit = "♣"
+		case 3:
+			suit = "♠"
+		}
+		if chek {
+			break
+		}
+		SlowPrint("| "+suit+" | ", 7000, false)
+	}
+	chek = false
+	for i := 0; i < len(playerCards); i++ {
+		switch playerCards[i].meaning {
+		case -1:
+			{
+				fmt.Println()
+				chek = true
+				break
+			}
+		case 0:
+			str = "|__В| "
+		case 1:
+			str = "|__Д| "
+		case 2:
+			str = "|__К| "
+		case 3:
+			str = "|__6| "
+		case 4:
+			str = "|__7| "
+		case 5:
+			str = "|__8| "
+		case 6:
+			str = "|__9| "
+		case 7:
+			str = "|_10| "
+		case 8:
+			str = "|__Т| "
+		}
+		if chek {
+			break
+		}
+		SlowPrint(str, 7000, false)
+	}
+
+	SlowPrint("Сумма очков ", 20000, false)
 	fmt.Print(score)
 	SlowPrint(".", 20000, true)
 }
 
-func GiveCard(user int8, counterCard int8, deck [36]int8, userCards [9]int8) (int8, int8, [36]int8, [9]int8) {
-	if deck[counterCard] == -1 {
-		panic("В колоде закончились карты!")
-	} else if deck[counterCard] < 3 {
-		user += deck[counterCard] + 2
-	} else if deck[counterCard] > 2 {
-		user += deck[counterCard] + 3
+func GiveCard(user int, counterCard int, deck [36]card, userCards [36]card) (int, int, [36]card, [36]card) {
+	if deck[counterCard].meaning < 3 {
+		user += deck[counterCard].meaning + 2
+	} else if deck[counterCard].meaning > 2 {
+		user += deck[counterCard].meaning + 3
 	}
-	userCards[deck[counterCard]] += 1
-	deck[counterCard] = -1
+	for i := 0; i < 36; i++ {
+		if userCards[i].meaning == -1 {
+			userCards[i].meaning = deck[counterCard].meaning
+			userCards[i].suit = deck[counterCard].suit
+			break
+		}
+	}
 	counterCard += 1
 	return user, counterCard, deck, userCards
 }
 
-func StirDeck() [36]int8 {
-	var CountDeck [9]int8
-	var Deck [36]int8
-	var card int8
+func StirDeck() [36]card {
+	var chek bool
+	var theCard card
+	var Deck [36]card
+	for i := 0; i < 36; i++ {
+		Deck[i].meaning = -1
+		Deck[i].suit = -1
+	}
 	for count := 0; count < 36; {
-		card = int8(rand.Int31n(9))
-		for CountDeck[card] > 3 {
-			card = int8(rand.Int31n(9))
+		chek = false
+		theCard.meaning = int(rand.Int31n(9))
+		theCard.suit = int(rand.Int31n(4))
+		for i := 0; i < 36; i++ {
+			if Deck[i] == theCard {
+				chek = true
+				break
+			}
 		}
-		CountDeck[card] += 1
-		Deck[count] = card
+		if chek {
+			continue
+		}
+		Deck[count] = theCard
 		count++
 	}
 	return Deck
@@ -124,8 +182,16 @@ func StirDeck() [36]int8 {
 
 func play() {
 	var take string
-	var playerCards, dealerCards [9]int8
-	var dealer, player, counterCard int8
+	var playerCards, dealerCards [36]card
+	for i := 0; i < 36; i++ {
+		playerCards[i].meaning = -1
+		playerCards[i].suit = -1
+	}
+	for i := 0; i < 36; i++ {
+		dealerCards[i].meaning = -1
+		dealerCards[i].suit = -1
+	}
+	var dealer, player, counterCard int
 	deck := StirDeck()
 	dealer, counterCard, deck, dealerCards = GiveCard(dealer, counterCard, deck, dealerCards)
 	player, counterCard, deck, playerCards = GiveCard(player, counterCard, deck, playerCards)
